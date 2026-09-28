@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Mirrors the client-side validation in lib/utils/validators.dart.
+    function isValidExpense(data) {
+      return data.keys().hasAll(['title', 'amount', 'category', 'date', 'updatedAt'])
+        && data.keys().hasOnly(['title', 'amount', 'category', 'date', 'note', 'createdAt', 'updatedAt'])
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 50
+        && data.amount is number && data.amount > 0 && data.amount <= 10000000
+        && data.category in ['food', 'transport', 'shopping', 'bills',
+                             'entertainment', 'health', 'education', 'other']
+        && data.date is timestamp
+        && (!('note' in data) || data.note == null
+            || (data.note is string && data.note.size() <= 200))
+        && data.updatedAt == request.time;
+    }
+
+    // Each user can only read and write their own expenses.
+    match /users/{userId}/expenses/{expenseId} {
+      allow read, delete: if isOwner(userId);
+
+      allow create: if isOwner(userId)
+        && isValidExpense(request.resource.data)
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isOwner(userId)
+        && isValidExpense(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // Everything else is denied by default.
+  }
+}
