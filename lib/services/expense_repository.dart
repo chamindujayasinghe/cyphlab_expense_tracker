@@ -96,9 +96,16 @@ class FirestoreExpenseRepository implements ExpenseRepository {
     return _guard(() => _expenses(uid).doc(expenseId).delete());
   }
 
+  /// Writes resolve only once the server confirms them. Firestore applies them
+  /// locally at once and queues them while offline, so after [_writeTimeout]
+  /// the write is treated as queued rather than leaving the UI waiting.
+  static const _writeTimeout = Duration(seconds: 10);
+
   Future<void> _guard(Future<void> Function() action) async {
     try {
-      await action();
+      await action().timeout(_writeTimeout);
+    } on TimeoutException {
+      return;
     } catch (error) {
       throw _mapError(error);
     }

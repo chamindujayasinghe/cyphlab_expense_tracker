@@ -83,8 +83,21 @@ class ExpenseProvider extends ChangeNotifier {
     });
   }
 
-  Future<String?> deleteExpense(Expense expense) {
-    return _run((uid) => _repository.deleteExpense(uid, expense.id));
+  /// Removes the expense from the list immediately (so a swiped-away tile
+  /// disappears at once), then deletes it; puts it back if that fails.
+  Future<String?> deleteExpense(Expense expense) async {
+    final previous = _expenses;
+    _expenses = List.unmodifiable(_expenses.where((e) => e.id != expense.id));
+    _notify();
+
+    final error = await _run(
+      (uid) => _repository.deleteExpense(uid, expense.id),
+    );
+    if (error != null && !_expenses.any((e) => e.id == expense.id)) {
+      _expenses = previous;
+      _notify();
+    }
+    return error;
   }
 
   /// Re-creates a just-deleted expense with its original id (undo).

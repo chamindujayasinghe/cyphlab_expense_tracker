@@ -8,11 +8,25 @@ Expense Tracker app (Flutter + Firebase) built as a practical task for CyphLab. 
 
 The brief asks for a simple app: judge scope against `project-scope.md` and don't add unrequested complexity. The README must eventually list setup steps, features, packages used, and AI tools used (a submission requirement).
 
-## Current state
+## Architecture
 
-Freshly generated with `flutter create` (org `com.cyphlab`). `lib/main.dart` initializes Firebase, then still shows the default counter demo; `test/widget_test.dart` is the default test. Update this file once the app architecture is in place.
+`project-plan.md` lists the build phases. Layers, top to bottom:
 
-Firebase: project `cyphlabs-expense-tracker`, configured with `flutterfire configure` for android, web and windows (Windows uses a web app config). Generated files are `lib/firebase_options.dart`, `android/app/google-services.json` and `firebase.json`. Re-run `flutterfire configure` rather than hand-editing them. The `flutterfire` executable is at `%LOCALAPPDATA%\Pub\Cache\bin\flutterfire.bat`, which may not be on PATH. Packages: `firebase_core`, `cloud_firestore`.
+- **Screens / widgets** (`lib/screens`, `lib/widgets`) talk only to providers, never to Firebase. `AuthGate` (the app's home route) shows a splash, `LoginScreen` or `HomeScreen` depending on `AuthProvider`.
+- **Providers** (`lib/providers`, `ChangeNotifier` + `provider`) hold state and expose actions that return `Future<String?>`: null on success, else a user-facing error message. Screens show that message in a SnackBar; they don't catch exceptions.
+- **Services** (`lib/services`) are abstract interfaces (`AuthService`, `ExpenseRepository`) with Firebase implementations. They throw `AuthException` / `ExpenseRepositoryException` carrying friendly messages mapped from Firebase error codes.
+
+Wiring is in `lib/main.dart`: `ExpenseProvider` is a `ChangeNotifierProxyProvider` of `AuthProvider`, and `updateUser(uid)` starts or stops the Firestore subscription on sign-in and sign-out. `updateUser` runs during build, so it must not call `notifyListeners` synchronously. `lib/app.dart` holds `MaterialApp` without providers, so tests can pump it with fakes.
+
+Data flow: `ExpenseProvider` streams one month at a time (`watchExpenses` with a date range, ordered by date, which needs no composite index). The total and any filtering are computed client-side. `deleteExpense` removes the item optimistically (required by `Dismissible`), and undo uses `restoreExpense`, which re-adds with the same id. Repository writes time out after 10s and are treated as queued, because Firestore only resolves writes on server acknowledgement.
+
+Firestore: `users/{uid}/expenses/{id}` holds `title, amount, category (enum name), date, note?, createdAt, updatedAt`. The timestamps are server timestamps added by the repository, not by `Expense.toMap`. `firestore.rules` enforces owner-only access and mirrors `lib/utils/validators.dart` and `AppConstants` limits. Change both sides together, then deploy with `firebase deploy --only firestore:rules`.
+
+Tests use fakes in `test/fakes/` (`FakeAuthService`, `FakeExpenseRepository`), and never touch Firebase.
+
+## Firebase setup
+
+Project `cyphlabs-expense-tracker` (default in `.firebaserc`), configured with `flutterfire configure` for android, web and windows (Windows uses a web app config). The generated files are `lib/firebase_options.dart`, `android/app/google-services.json` and the `flutter` block in `firebase.json`. Re-run `flutterfire configure` rather than hand-editing them. The `flutterfire` executable is at `%LOCALAPPDATA%\Pub\Cache\bin\flutterfire.bat`, which may not be on PATH. Auth is email/password only.
 
 ## Commands
 

@@ -6,25 +6,25 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 ## Core Requirements (must have)
 
 ### Expense management
-- [ ] Add a new expense
-- [ ] Edit an existing expense
-- [ ] Delete an expense
-- [ ] Select a category for each expense
+- [x] Add a new expense
+- [x] Edit an existing expense
+- [x] Delete an expense
+- [x] Select a category for each expense
 
 ### Data
-- [ ] Store expenses in Firebase (Cloud Firestore)
+- [x] Store expenses in Firebase (Cloud Firestore)
 
 ### Views
-- [ ] Show total expenses for the selected/current month
-- [ ] Show expense history/list
+- [x] Show total expenses for the selected/current month
+- [x] Show expense history/list
 - [ ] Filter expenses by category
 - [ ] Filter expenses by date
 
 ### Quality
-- [ ] Proper form validation (required fields, valid positive amount, valid date)
-- [ ] Handle loading states
-- [ ] Handle empty states
-- [ ] Handle error states
+- [x] Proper form validation (required fields, valid positive amount, valid date)
+- [x] Handle loading states
+- [x] Handle empty states
+- [x] Handle error states
 
 ## Expense Data Model
 
@@ -43,7 +43,7 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 - [ ] Dark mode
 - [ ] Monthly / category-wise summary
 - [ ] Search
-- [ ] Firebase Authentication
+- [x] Firebase Authentication
 - [ ] Any other useful improvement
 
 ## Evaluation Criteria
