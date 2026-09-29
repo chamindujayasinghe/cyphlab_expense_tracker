@@ -21,6 +21,12 @@ void main() {
     WidgetTester tester, {
     DateTime Function()? clock,
   }) async {
+    // Phone-like portrait screen so the list isn't pushed off-screen by the
+    // header, total card and filter bar.
+    tester.view.physicalSize = const Size(420, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
     repository = FakeExpenseRepository();
     expenses = ExpenseProvider(repository, clock: clock)..updateUser('user-1');
     await tester.pumpWidget(
@@ -82,6 +88,53 @@ void main() {
     expect(find.text('2 expenses'), findsOneWidget);
     // Month total in the card and the day total in the header.
     expect(find.text('LKR 1,500.00'), findsNWidgets(2));
+  });
+
+  testWidgets('search and category chips filter the list and total', (
+    tester,
+  ) async {
+    await pumpHome(tester, clock: fixedClock);
+    repository.emit([
+      Expense(
+        id: 'a',
+        title: 'Lunch',
+        amount: 1200,
+        category: ExpenseCategory.food,
+        date: DateTime(2026, 9, 12, 13),
+      ),
+      Expense(
+        id: 'b',
+        title: 'Bus fare',
+        amount: 300,
+        category: ExpenseCategory.transport,
+        date: DateTime(2026, 9, 11, 8),
+      ),
+    ]);
+    await tester.pump();
+
+    final transportChip = find.widgetWithText(FilterChip, 'Transport');
+    await tester.ensureVisible(transportChip);
+    await tester.tap(transportChip);
+    await tester.pumpAndSettle();
+    expect(find.text('Lunch'), findsNothing);
+    expect(find.text('Bus fare'), findsOneWidget);
+    expect(find.text('1 of 2 expenses'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField).first, 'taxi');
+    await tester.pump();
+    expect(find.text('No matching expenses'), findsOneWidget);
+
+    final clearButton = find.widgetWithText(TextButton, 'Clear filters');
+    await tester.ensureVisible(clearButton);
+    await tester.tap(clearButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Lunch'), findsOneWidget);
+    expect(find.text('Bus fare'), findsOneWidget);
+    expect(find.text('2 expenses'), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller!.text,
+      isEmpty,
+    );
   });
 
   testWidgets('shows the error state and retries', (tester) async {

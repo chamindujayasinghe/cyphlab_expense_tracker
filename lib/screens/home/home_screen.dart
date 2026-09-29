@@ -8,6 +8,7 @@ import '../../utils/constants.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/expense_tile.dart';
+import '../../widgets/filter_bar.dart';
 import '../../widgets/month_selector.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/total_card.dart';
@@ -70,16 +71,18 @@ Future<void> openExpenseForm(BuildContext context, [Expense? expense]) async {
 
   switch (result.action) {
     case ExpenseFormAction.added:
-      final selected = context.read<ExpenseProvider>().selectedMonth;
+      // Explain why a new expense doesn't appear in the current view.
+      final provider = context.read<ExpenseProvider>();
       final date = result.expense.date;
-      final inOtherMonth =
-          date.year != selected.year || date.month != selected.month;
-      _showMessage(
-        context,
-        inOtherMonth
-            ? 'Expense added to ${Formatters.monthYear(date)}'
-            : 'Expense added',
-      );
+      final String message;
+      if (provider.isInPeriod(date)) {
+        message = 'Expense added';
+      } else if (provider.hasDateRange) {
+        message = 'Expense added outside the selected dates';
+      } else {
+        message = 'Expense added to ${Formatters.monthYear(date)}';
+      }
+      _showMessage(context, message);
     case ExpenseFormAction.updated:
       _showMessage(context, 'Expense updated');
     case ExpenseFormAction.deleted:
@@ -123,39 +126,88 @@ void _showMessage(BuildContext context, String message) {
     ..showSnackBar(SnackBar(content: Text(message)));
 }
 
-class _ExpenseOverview extends StatelessWidget {
+class _ExpenseOverview extends StatefulWidget {
   const _ExpenseOverview();
+
+  @override
+  State<_ExpenseOverview> createState() => _ExpenseOverviewState();
+}
+
+class _ExpenseOverviewState extends State<_ExpenseOverview> {
+  // Owned here (not in FilterBar) so "Clear filters" in the empty state can
+  // reset the search text too.
+  final _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    context.read<ExpenseProvider>().setSearchQuery(_searchController.text);
+  }
+
+  void _clearFilters() {
+    _searchController.clear();
+    context.read<ExpenseProvider>().clearFilters();
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ExpenseProvider>();
-    final month = provider.selectedMonth;
-    final isCurrentMonth = !provider.canGoToNextMonth;
     final showSpinner = provider.isLoading && provider.expenses.isEmpty;
+    final rangeStart = provider.rangeStart;
+    final rangeEnd = provider.rangeEnd;
+    final periodLabel = rangeStart != null && rangeEnd != null
+        ? Formatters.dateRange(rangeStart, rangeEnd)
+        : Formatters.monthYear(provider.selectedMonth);
 
     return CustomScrollView(
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
           sliver: SliverToBoxAdapter(
-            child: MonthSelector(
-              month: month,
-              onPrevious: provider.previousMonth,
-              onNext: provider.canGoToNextMonth ? provider.nextMonth : null,
-            ),
+            child: provider.hasDateRange
+                ? _DateRangeHeader(
+                    label: periodLabel,
+                    onClose: provider.clearDateRange,
+                  )
+                : MonthSelector(
+                    month: provider.selectedMonth,
+                    onPrevious: provider.previousMonth,
+                    onNext: provider.canGoToNextMonth
+                        ? provider.nextMonth
+                        : null,
+                  ),
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           sliver: SliverToBoxAdapter(
             child: TotalCard(
-              label: isCurrentMonth
+              label: provider.isCurrentMonth
                   ? 'Spent this month'
-                  : 'Spent in ${Formatters.monthYear(month)}',
+                  : 'Spent in $periodLabel',
               total: provider.total,
-              count: provider.expenses.length,
+              count: provider.visibleExpenses.length,
+              totalCount: provider.hasListFilters
+                  ? provider.expenses.length
+                  : null,
               isLoading: showSpinner || provider.hasError,
             ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: FilterBar(
+            controller: _searchController,
+            onClearAll: _clearFilters,
           ),
         ),
         if (showSpinner)
@@ -176,16 +228,65 @@ class _ExpenseOverview extends StatelessWidget {
             hasScrollBody: false,
             child: EmptyState(
               icon: Icons.receipt_long_outlined,
-              title: isCurrentMonth
+              title: provider.isCurrentMonth
                   ? 'No expenses this month'
-                  : 'No expenses in ${Formatters.monthYear(month)}',
+                  : 'No expenses in $periodLabel',
               message: 'Tap "Add expense" to record one.',
+              action: provider.hasDateRange
+                  ? TextButton(
+                      onPressed: provider.clearDateRange,
+                      child: const Text('Back to month view'),
+                    )
+                  : null,
+            ),
+          )
+        else if (provider.visibleExpenses.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: EmptyState(
+              icon: Icons.search_off,
+              title: 'No matching expenses',
+              message: 'Try a different search or category.',
+              action: TextButton(
+                onPressed: _clearFilters,
+                child: const Text('Clear filters'),
+              ),
             ),
           )
         else
-          _ExpenseList(expenses: provider.expenses),
+          _ExpenseList(expenses: provider.visibleExpenses),
         // Keeps the last tile clear of the floating action button.
         const SliverToBoxAdapter(child: SizedBox(height: 88)),
+      ],
+    );
+  }
+}
+
+/// Replaces the month selector while a custom date range is active.
+class _DateRangeHeader extends StatelessWidget {
+  const _DateRangeHeader({required this.label, required this.onClose});
+
+  final String label;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(width: 48),
+        Expanded(
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+        IconButton(
+          tooltip: 'Back to month view',
+          icon: const Icon(Icons.close),
+          onPressed: onClose,
+        ),
       ],
     );
   }

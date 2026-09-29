@@ -17,8 +17,8 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 ### Views
 - [x] Show total expenses for the selected/current month
 - [x] Show expense history/list
-- [ ] Filter expenses by category
-- [ ] Filter expenses by date
+- [x] Filter expenses by category
+- [x] Filter expenses by date
 
 ### Quality
 - [x] Proper form validation (required fields, valid positive amount, valid date)
@@ -42,7 +42,7 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 - [ ] Simple expense chart
 - [ ] Dark mode
 - [ ] Monthly / category-wise summary
-- [ ] Search
+- [x] Search
 - [x] Firebase Authentication
 - [ ] Any other useful improvement
 

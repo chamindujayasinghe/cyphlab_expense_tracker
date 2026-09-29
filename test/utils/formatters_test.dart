@@ -11,6 +11,25 @@ void main() {
     expect(Formatters.monthYear(DateTime(2026, 9, 29)), 'September 2026');
   });
 
+  test('dateRange shortens shared month and year', () {
+    expect(
+      Formatters.dateRange(DateTime(2026, 9, 1), DateTime(2026, 9, 15)),
+      'Sep 1 – 15, 2026',
+    );
+    expect(
+      Formatters.dateRange(DateTime(2026, 8, 28), DateTime(2026, 9, 3)),
+      'Aug 28 – Sep 3, 2026',
+    );
+    expect(
+      Formatters.dateRange(DateTime(2025, 12, 30), DateTime(2026, 1, 2)),
+      'Dec 30, 2025 – Jan 2, 2026',
+    );
+    expect(
+      Formatters.dateRange(DateTime(2026, 9, 5), DateTime(2026, 9, 5)),
+      'Sep 5, 2026',
+    );
+  });
+
   test('relativeDay returns Today, Yesterday, or a date', () {
     final now = DateTime(2026, 9, 29, 9);
 

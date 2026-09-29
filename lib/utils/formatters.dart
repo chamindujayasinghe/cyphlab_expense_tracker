@@ -22,6 +22,16 @@ class Formatters {
   /// `September 2026`
   static String monthYear(DateTime date) => _monthYear.format(date);
 
+  /// `Sep 1 – 15, 2026`, `Aug 28 – Sep 3, 2026` or `Dec 30, 2025 – Jan 2, 2026`.
+  static String dateRange(DateTime start, DateTime end) {
+    if (start.year != end.year) return '${date(start)} – ${date(end)}';
+    if (start.month != end.month) {
+      return '${DateFormat.MMMd().format(start)} – ${date(end)}';
+    }
+    if (start.day == end.day) return date(start);
+    return '${DateFormat.MMMd().format(start)} – ${end.day}, ${end.year}';
+  }
+
   /// `Today`, `Yesterday`, or the formatted date. Used for list group headers.
   static String relativeDay(DateTime date, {DateTime? now}) {
     final today = _dateOnly(now ?? DateTime.now());
