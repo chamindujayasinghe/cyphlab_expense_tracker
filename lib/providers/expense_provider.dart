@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/expense.dart';
 import '../models/expense_category.dart';
 import '../services/expense_repository.dart';
+import '../utils/expense_stats.dart';
 
 /// Holds the signed-in user's expenses for the selected period, plus the
 /// category and search filters applied to them.
@@ -163,6 +164,31 @@ class ExpenseProvider extends ChangeNotifier {
 
   /// Re-subscribes after an error.
   void retry() => _subscribe();
+
+  /// Live monthly totals for the [months] months ending with the selected
+  /// month (oldest first). A separate query from the main list, used by the
+  /// summary screen's trend chart.
+  Stream<List<MonthTotal>> watchMonthlyTotals({int months = 6}) {
+    final uid = _uid;
+    if (uid == null) return const Stream.empty();
+    final firstMonth = DateTime(
+      _selectedMonth.year,
+      _selectedMonth.month - months + 1,
+    );
+    return _repository
+        .watchExpenses(
+          uid: uid,
+          start: firstMonth,
+          end: DateTime(_selectedMonth.year, _selectedMonth.month + 1),
+        )
+        .map(
+          (expenses) => ExpenseStats.byMonth(
+            expenses,
+            firstMonth: firstMonth,
+            count: months,
+          ),
+        );
+  }
 
   /// Adds [expense] if it has no id yet, otherwise updates it.
   Future<String?> saveExpense(Expense expense) {

@@ -22,6 +22,12 @@ class Formatters {
   /// `September 2026`
   static String monthYear(DateTime date) => _monthYear.format(date);
 
+  /// `Sep`
+  static String shortMonth(DateTime date) => DateFormat.MMM().format(date);
+
+  /// `42%`
+  static String percent(double share) => '${(share * 100).round()}%';
+
   /// `Sep 1 – 15, 2026`, `Aug 28 – Sep 3, 2026` or `Dec 30, 2025 – Jan 2, 2026`.
   static String dateRange(DateTime start, DateTime end) {
     if (start.year != end.year) return '${date(start)} – ${date(end)}';

@@ -39,9 +39,9 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 
 ## Optional Features (nice to have)
 
-- [ ] Simple expense chart
+- [x] Simple expense chart
 - [ ] Dark mode
-- [ ] Monthly / category-wise summary
+- [x] Monthly / category-wise summary
 - [x] Search
 - [x] Firebase Authentication
 - [ ] Any other useful improvement

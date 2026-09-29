@@ -12,7 +12,7 @@ The brief asks for a simple app: judge scope against `project-scope.md` and don'
 
 `project-plan.md` lists the build phases. Layers, top to bottom:
 
-- **Screens / widgets** (`lib/screens`, `lib/widgets`) talk only to providers, never to Firebase. `AuthGate` (the app's home route) shows a splash, `LoginScreen` or `HomeScreen` depending on `AuthProvider`.
+- **Screens / widgets** (`lib/screens`, `lib/widgets`) talk only to providers, never to Firebase. `AuthGate` (the app's home route) shows a splash, `LoginScreen` or `MainShell` depending on `AuthProvider`. `MainShell` holds the Expenses (`HomeScreen`) and Summary tabs in a lazily built `IndexedStack`, shown as a bottom `NavigationBar` or, at 840px and wider, a `NavigationRail`. Because tabs stay alive, widgets that start their own queries (such as the summary trend chart) must re-query when the provider's period changes.
 - **Providers** (`lib/providers`, `ChangeNotifier` + `provider`) hold state and expose actions that return `Future<String?>`: null on success, else a user-facing error message. Screens show that message in a SnackBar; they don't catch exceptions.
 - **Services** (`lib/services`) are abstract interfaces (`AuthService`, `ExpenseRepository`) with Firebase implementations. They throw `AuthException` / `ExpenseRepositoryException` carrying friendly messages mapped from Firebase error codes.
 
