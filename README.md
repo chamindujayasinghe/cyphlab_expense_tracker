@@ -75,6 +75,15 @@ users/{uid}/expenses/{expenseId}
 
 [`firestore.rules`](firestore.rules) allows each user to read and write only their own expenses. It also validates every write: field types, title length, amount range, a known category, and server timestamps.
 
+### A note on the Firebase keys in this repo
+
+`lib/firebase_options.dart` and `android/app/google-services.json` contain Firebase API keys, and GitHub's secret scanning flags them. They are **not secrets**:
+
+- **They're client config.** A Firebase API key only identifies which Firebase project the app talks to. Every Firebase app ships it inside the APK or the web bundle, where anyone can read it. [Firebase's documentation](https://firebase.google.com/docs/projects/api-keys) says these keys can be safely included in code and public repos.
+- **Access is controlled by the security rules and Firebase Auth, not by the key.** Without signing in, a request is rejected; once signed in, a user can only reach their own expenses.
+- **The repo contains no real secrets:** no service-account or Admin SDK keys, private keys, passwords or signing keystores.
+- **The keys are committed on purpose,** so reviewers can run the app without setting up their own Firebase project.
+
 ## Setup
 
 ### Prerequisites
