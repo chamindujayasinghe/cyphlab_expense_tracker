@@ -228,6 +228,9 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                     const SizedBox(height: 16),
                     DropdownButtonFormField<ExpenseCategory>(
                       initialValue: _category,
+                      // Fill the field width so long labels ellipsize instead
+                      // of overflowing on narrow screens.
+                      isExpanded: true,
                       validator: (value) =>
                           value == null ? 'Please choose a category' : null,
                       decoration: const InputDecoration(
@@ -242,7 +245,13 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                               children: [
                                 CategoryAvatar(category: category, radius: 12),
                                 const SizedBox(width: 12),
-                                Text(category.label),
+                                Flexible(
+                                  child: Text(
+                                    category.label,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ],
                             ),
                           ),

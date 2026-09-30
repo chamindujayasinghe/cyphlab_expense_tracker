@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'home/home_screen.dart';
+import 'settings/settings_screen.dart';
 import 'summary/summary_screen.dart';
 
-/// Signed-in shell with labeled Expenses / Summary destinations: a bottom
+/// Signed-in shell with labeled Expenses / Summary / Settings tabs: a bottom
 /// navigation bar on phones and a side rail on wide screens.
 ///
 /// Tabs are kept alive in an [IndexedStack] so switching back preserves
@@ -34,6 +35,11 @@ class _MainShellState extends State<MainShell> {
       icon: Icons.pie_chart_outline,
       selectedIcon: Icons.pie_chart,
     ),
+    (
+      label: 'Settings',
+      icon: Icons.settings_outlined,
+      selectedIcon: Icons.settings,
+    ),
   ];
 
   void _select(int index) {
@@ -45,7 +51,11 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildTab(int index) {
     if (!_visited.contains(index)) return const SizedBox.shrink();
-    return index == 0 ? const HomeScreen() : const SummaryScreen();
+    return switch (index) {
+      0 => const HomeScreen(),
+      1 => const SummaryScreen(),
+      _ => const SettingsScreen(),
+    };
   }
 
   @override

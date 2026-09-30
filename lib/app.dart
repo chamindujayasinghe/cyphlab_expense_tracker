@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'providers/theme_provider.dart';
 import 'screens/auth/auth_gate.dart';
 import 'theme/app_theme.dart';
 import 'utils/constants.dart';
@@ -16,7 +18,7 @@ class ExpenseTrackerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: context.watch<ThemeProvider>().themeMode,
       home: const AuthGate(),
     );
   }

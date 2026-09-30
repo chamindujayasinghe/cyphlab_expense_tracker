@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/expense.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../utils/constants.dart';
 import '../../utils/formatters.dart';
@@ -21,16 +20,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppConstants.appName),
-        actions: [
-          IconButton(
-            tooltip: 'Sign out',
-            icon: const Icon(Icons.logout),
-            onPressed: () => _confirmSignOut(context),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text(AppConstants.appName)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => openExpenseForm(context),
         icon: const Icon(Icons.add),
@@ -46,19 +36,6 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _confirmSignOut(BuildContext context) async {
-    final confirmed = await showConfirmDialog(
-      context,
-      title: 'Sign out?',
-      message: 'You can sign back in at any time.',
-      confirmLabel: 'Sign out',
-    );
-    if (!confirmed || !context.mounted) return;
-
-    final error = await context.read<AuthProvider>().signOut();
-    if (error != null && context.mounted) _showMessage(context, error);
   }
 }
 
@@ -350,15 +327,24 @@ class _ExpenseList extends StatelessWidget {
                 Expanded(
                   child: Text(
                     Formatters.relativeDay(row.date),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelLarge?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
                   ),
                 ),
-                Text(
-                  Formatters.currency(row.total),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      Formatters.currency(row.total),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
               ],

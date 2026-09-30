@@ -12,7 +12,7 @@ The brief asks for a simple app: judge scope against `project-scope.md` and don'
 
 `project-plan.md` lists the build phases. Layers, top to bottom:
 
-- **Screens / widgets** (`lib/screens`, `lib/widgets`) talk only to providers, never to Firebase. `AuthGate` (the app's home route) shows a splash, `LoginScreen` or `MainShell` depending on `AuthProvider`. `MainShell` holds the Expenses (`HomeScreen`) and Summary tabs in a lazily built `IndexedStack`, shown as a bottom `NavigationBar` or, at 840px and wider, a `NavigationRail`. Because tabs stay alive, widgets that start their own queries (such as the summary trend chart) must re-query when the provider's period changes.
+- **Screens / widgets** (`lib/screens`, `lib/widgets`) talk only to providers, never to Firebase. `AuthGate` (the app's home route) shows a splash, `LoginScreen` or `MainShell` depending on `AuthProvider`. `MainShell` holds the Expenses (`HomeScreen`), Summary and Settings tabs in a lazily built `IndexedStack`, shown as a bottom `NavigationBar` or, at 840px and wider, a `NavigationRail`. Because tabs stay alive, widgets that start their own queries (such as the summary trend chart) must re-query when the provider's period changes.
 - **Providers** (`lib/providers`, `ChangeNotifier` + `provider`) hold state and expose actions that return `Future<String?>`: null on success, else a user-facing error message. Screens show that message in a SnackBar; they don't catch exceptions.
 - **Services** (`lib/services`) are abstract interfaces (`AuthService`, `ExpenseRepository`) with Firebase implementations. They throw `AuthException` / `ExpenseRepositoryException` carrying friendly messages mapped from Firebase error codes.
 
@@ -22,7 +22,11 @@ Data flow: `ExpenseProvider` streams one period at a time: the selected month, o
 
 Firestore: `users/{uid}/expenses/{id}` holds `title, amount, category (enum name), date, note?, createdAt, updatedAt`. The timestamps are server timestamps added by the repository, not by `Expense.toMap`. `firestore.rules` enforces owner-only access and mirrors `lib/utils/validators.dart` and `AppConstants` limits. Change both sides together, then deploy with `firebase deploy --only firestore:rules`.
 
-Tests use fakes in `test/fakes/` (`FakeAuthService`, `FakeExpenseRepository`), and never touch Firebase.
+Theme: `ThemeProvider` persists the light/dark/system choice with `shared_preferences`. `main()` loads the prefs before `runApp` so the first frame uses the right theme.
+
+Tests use fakes in `test/fakes/` (`FakeAuthService`, `FakeExpenseRepository`), and never touch Firebase. `test/screens/small_screen_test.dart` renders every screen at 320×568 with 1.3× text in both themes, so new layouts must not overflow there.
+
+Launcher icons: `tool/generate_icon_test.dart` draws the source PNGs into `assets/icon/` (run it with `flutter test tool/generate_icon_test.dart`), then `dart run flutter_launcher_icons` generates the platform icons from the config in `pubspec.yaml`.
 
 ## Firebase setup
 

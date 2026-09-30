@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:cyphlab_expense_tracker/app.dart';
 import 'package:cyphlab_expense_tracker/providers/auth_provider.dart';
+import 'package:cyphlab_expense_tracker/providers/theme_provider.dart';
 
 import 'fakes/fake_auth_service.dart';
 
@@ -13,8 +14,11 @@ void main() {
   Future<void> pumpApp(WidgetTester tester) async {
     service = FakeAuthService();
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => AuthProvider(service),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider(null)),
+          ChangeNotifierProvider(create: (_) => AuthProvider(service)),
+        ],
         child: const ExpenseTrackerApp(),
       ),
     );

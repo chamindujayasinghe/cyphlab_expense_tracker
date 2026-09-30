@@ -40,7 +40,7 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 ## Optional Features (nice to have)
 
 - [x] Simple expense chart
-- [ ] Dark mode
+- [x] Dark mode
 - [x] Monthly / category-wise summary
 - [x] Search
 - [x] Firebase Authentication

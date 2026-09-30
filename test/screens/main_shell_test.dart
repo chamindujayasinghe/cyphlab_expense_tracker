@@ -6,6 +6,7 @@ import 'package:cyphlab_expense_tracker/models/expense.dart';
 import 'package:cyphlab_expense_tracker/models/expense_category.dart';
 import 'package:cyphlab_expense_tracker/providers/auth_provider.dart';
 import 'package:cyphlab_expense_tracker/providers/expense_provider.dart';
+import 'package:cyphlab_expense_tracker/providers/theme_provider.dart';
 import 'package:cyphlab_expense_tracker/screens/main_shell.dart';
 import 'package:cyphlab_expense_tracker/theme/app_theme.dart';
 
@@ -27,12 +28,20 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider(null)),
           ChangeNotifierProvider(
             create: (_) => AuthProvider(FakeAuthService()),
           ),
           ChangeNotifierProvider.value(value: expenses),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: const MainShell()),
+        child: Consumer<ThemeProvider>(
+          builder: (_, theme, _) => MaterialApp(
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: theme.themeMode,
+            home: const MainShell(),
+          ),
+        ),
       ),
     );
     repository.emit([
@@ -96,5 +105,21 @@ void main() {
 
     expect(repository.lastWatch!.start, DateTime(2026, 3));
     expect(repository.lastWatch!.end, DateTime(2026, 9));
+  });
+
+  testWidgets('settings tab switches to dark mode', (tester) async {
+    await pumpShell(tester, const Size(420, 900));
+
+    await tester.tap(find.text('Settings'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Appearance'), findsOneWidget);
+
+    await tester.tap(find.text('Dark'));
+    // First pump starts the theme animation, the second lets it finish.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    final context = tester.element(find.text('Appearance'));
+    expect(Theme.of(context).brightness, Brightness.dark);
   });
 }
