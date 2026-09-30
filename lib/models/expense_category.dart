@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Fixed set of expense categories. Stored in Firestore by [name].
+/// Expense categories, stored in Firestore by name.
 enum ExpenseCategory {
   food('Food', Icons.restaurant, Color(0xFFEF6C00)),
   transport('Transport', Icons.directions_bus, Color(0xFF1E88E5)),
@@ -17,8 +17,7 @@ enum ExpenseCategory {
   final IconData icon;
   final Color color;
 
-  /// Parses a stored category name, falling back to [other] for unknown or
-  /// missing values so a bad document never crashes the list.
+  /// Unknown names fall back to [other] so bad data can't crash the list.
   static ExpenseCategory fromName(String? name) {
     return ExpenseCategory.values.firstWhere(
       (category) => category.name == name,

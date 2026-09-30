@@ -9,11 +9,8 @@ import '../../utils/formatters.dart';
 import '../../widgets/expense_tile.dart';
 import '../../widgets/state_views.dart';
 
-/// Spending breakdown for the period shown on the home screen, plus a
-/// six-month trend.
-///
-/// The category breakdown uses the whole period (ignoring the home screen's
-/// category and search filters), so it matches the unfiltered month total.
+/// Summary tab: category breakdown for the period and a six-month trend.
+/// Uses all expenses in the period, ignoring the Expenses tab filters.
 class SummaryScreen extends StatelessWidget {
   const SummaryScreen({super.key});
 
@@ -308,8 +305,7 @@ class _MonthlyTrendState extends State<_MonthlyTrend> {
 
   @override
   Widget build(BuildContext context) {
-    // This tab stays alive in the shell, so re-query whenever the selected
-    // month changes on the Expenses tab.
+    // This tab stays alive, so re-query when the month changes.
     final month = context.select<ExpenseProvider, DateTime>(
       (provider) => provider.selectedMonth,
     );

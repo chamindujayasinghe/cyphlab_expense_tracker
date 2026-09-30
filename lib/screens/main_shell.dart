@@ -4,16 +4,11 @@ import 'home/home_screen.dart';
 import 'settings/settings_screen.dart';
 import 'summary/summary_screen.dart';
 
-/// Signed-in shell with labeled Expenses / Summary / Settings tabs: a bottom
-/// navigation bar on phones and a side rail on wide screens.
-///
-/// Tabs are kept alive in an [IndexedStack] so switching back preserves
-/// state such as the search text. Each tab is only built once first visited,
-/// so the summary's extra query doesn't run until it's opened.
+/// Signed-in tabs: bottom bar on phones, side rail on wide screens.
+/// Tabs stay alive in an IndexedStack and are built on first visit.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
-  /// Width at which the bottom bar is replaced by a navigation rail.
   static const double railBreakpoint = 840;
 
   @override

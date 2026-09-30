@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
     if (!mounted) return;
     if (error != null) _showMessage(error);
-    // On success AuthGate swaps this screen for the home screen.
+    // On success, AuthGate shows the main tabs.
   }
 
   Future<void> _resetPassword() async {

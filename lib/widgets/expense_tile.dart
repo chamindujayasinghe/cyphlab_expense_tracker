@@ -34,7 +34,7 @@ class ExpenseTile extends StatelessWidget {
   final Expense expense;
   final VoidCallback onTap;
 
-  /// Asks the user to confirm; the tile is only removed if this returns true.
+  /// Returns true to confirm the delete.
   final Future<bool> Function() confirmDelete;
   final VoidCallback onDeleted;
 
@@ -74,8 +74,7 @@ class ExpenseTile extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        // Large amounts or big system text would otherwise push the title
-        // out of the row, so the amount shrinks to fit instead.
+        // Shrink large amounts instead of overflowing the row.
         trailing: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.sizeOf(context).width * 0.35,

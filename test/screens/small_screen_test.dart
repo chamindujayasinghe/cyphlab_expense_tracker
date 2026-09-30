@@ -18,8 +18,7 @@ import 'package:cyphlab_expense_tracker/theme/app_theme.dart';
 import '../fakes/fake_auth_service.dart';
 import '../fakes/fake_expense_repository.dart';
 
-/// Renders each screen on a small phone (iPhone SE size) with enlarged text,
-/// in both themes. Any layout overflow fails the test.
+/// Every screen on a 320x568 phone with 1.3x text, in both themes.
 void main() {
   final expense = Expense(
     id: 'a',

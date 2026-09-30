@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// Thrown by [AuthService] with a message that is safe to show to the user.
+/// Auth error with a user-friendly message.
 class AuthException implements Exception {
   const AuthException(this.message);
 
@@ -10,8 +10,7 @@ class AuthException implements Exception {
   String toString() => 'AuthException: $message';
 }
 
-/// Authentication operations used by the app. Abstract so providers can be
-/// tested with a fake implementation.
+/// Authentication interface (abstract so tests can use a fake).
 abstract class AuthService {
   Stream<User?> authStateChanges();
 

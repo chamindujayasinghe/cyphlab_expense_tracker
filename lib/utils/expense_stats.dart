@@ -16,17 +16,15 @@ class CategoryTotal {
 class MonthTotal {
   const MonthTotal(this.month, this.total);
 
-  /// First day of the month.
   final DateTime month;
   final double total;
 }
 
-/// Pure aggregation helpers used by the summary screen.
+/// Aggregations for the summary screen.
 class ExpenseStats {
   ExpenseStats._();
 
-  /// Per-category totals, largest first. Categories with no spend are left
-  /// out.
+  /// Per-category totals, largest first.
   static List<CategoryTotal> byCategory(List<Expense> expenses) {
     final totals = <ExpenseCategory, double>{};
     for (final expense in expenses) {
@@ -48,8 +46,7 @@ class ExpenseStats {
       ..sort((a, b) => b.total.compareTo(a.total));
   }
 
-  /// Totals for [count] consecutive months starting at [firstMonth], oldest
-  /// first. Months with no expenses are included with a zero total.
+  /// Totals for [count] months from [firstMonth], zero-filled.
   static List<MonthTotal> byMonth(
     List<Expense> expenses, {
     required DateTime firstMonth,

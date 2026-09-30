@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Shared layout for the login and register screens: a centered, scrollable,
-/// width-constrained column with a header.
+/// Shared layout for the login and register screens.
 class AuthLayout extends StatelessWidget {
   const AuthLayout({
     super.key,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Centered icon, title, message and optional action, used for empty lists.
+/// Empty-state message with an icon and optional action.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,

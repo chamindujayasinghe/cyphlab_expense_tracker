@@ -13,7 +13,7 @@ import '../../widgets/state_views.dart';
 import '../../widgets/total_card.dart';
 import '../expense_form/expense_form_screen.dart';
 
-/// Monthly expense overview: month switcher, total, and the day-grouped list.
+/// Expenses tab: month switcher, total, filters and the day-grouped list.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -39,7 +39,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-/// Opens the add form, or the edit form for [expense], and reports the result.
+/// Opens the add/edit form and shows feedback for the result.
 Future<void> openExpenseForm(BuildContext context, [Expense? expense]) async {
   final result = await Navigator.of(context).push<ExpenseFormResult>(
     MaterialPageRoute(builder: (_) => ExpenseFormScreen(expense: expense)),
@@ -111,8 +111,7 @@ class _ExpenseOverview extends StatefulWidget {
 }
 
 class _ExpenseOverviewState extends State<_ExpenseOverview> {
-  // Owned here (not in FilterBar) so "Clear filters" in the empty state can
-  // reset the search text too.
+  // Owned here so "Clear filters" can also reset the search text.
   final _searchController = TextEditingController();
 
   @override
@@ -269,7 +268,7 @@ class _DateRangeHeader extends StatelessWidget {
   }
 }
 
-/// Day header row: `Today · LKR 1,500.00`.
+/// Data for a day header row.
 class _DayHeader {
   const _DayHeader(this.date, this.total);
 
@@ -283,7 +282,6 @@ class _ExpenseList extends StatelessWidget {
   /// Sorted newest first.
   final List<Expense> expenses;
 
-  /// Interleaves a [_DayHeader] before each day's expenses.
   List<Object> _buildRows() {
     DateTime dayOf(Expense e) =>
         DateTime(e.date.year, e.date.month, e.date.day);

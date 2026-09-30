@@ -13,19 +13,14 @@ class Formatters {
   static final DateFormat _date = DateFormat.yMMMd();
   static final DateFormat _monthYear = DateFormat.yMMMM();
 
-  /// `LKR 1,250.50`
   static String currency(double amount) => _currency.format(amount);
 
-  /// `Sep 29, 2026`
   static String date(DateTime date) => _date.format(date);
 
-  /// `September 2026`
   static String monthYear(DateTime date) => _monthYear.format(date);
 
-  /// `Sep`
   static String shortMonth(DateTime date) => DateFormat.MMM().format(date);
 
-  /// `42%`
   static String percent(double share) => '${(share * 100).round()}%';
 
   /// `Sep 1 – 15, 2026`, `Aug 28 – Sep 3, 2026` or `Dec 30, 2025 – Jan 2, 2026`.
@@ -38,7 +33,7 @@ class Formatters {
     return '${DateFormat.MMMd().format(start)} – ${end.day}, ${end.year}';
   }
 
-  /// `Today`, `Yesterday`, or the formatted date. Used for list group headers.
+  /// `Today`, `Yesterday` or the date, for list headers.
   static String relativeDay(DateTime date, {DateTime? now}) {
     final today = _dateOnly(now ?? DateTime.now());
     final difference = today.difference(_dateOnly(date)).inDays;

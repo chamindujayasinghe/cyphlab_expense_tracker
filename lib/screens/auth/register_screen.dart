@@ -43,8 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ..showSnackBar(SnackBar(content: Text(error)));
       return;
     }
-    // Registration signs the user in; AuthGate (the first route) now shows
-    // the home screen, so drop this pushed route.
+    // Now signed in: AuthGate shows the main tabs, so close this route.
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 

@@ -5,10 +5,7 @@ import '../models/expense_category.dart';
 import '../providers/expense_provider.dart';
 import '../utils/formatters.dart';
 
-/// Search field plus a scrollable row of date-range and category chips.
-///
-/// The search [controller] is owned by the parent so it can be cleared
-/// together with the other filters.
+/// Search field plus date-range and category filter chips.
 class FilterBar extends StatelessWidget {
   const FilterBar({
     super.key,

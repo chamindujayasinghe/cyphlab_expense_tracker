@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/formatters.dart';
 
-/// Highlighted card showing the total spend and expense count for the period.
+/// Card with the period total and expense count.
 class TotalCard extends StatelessWidget {
   const TotalCard({
     super.key,
@@ -15,11 +15,9 @@ class TotalCard extends StatelessWidget {
 
   final String label;
   final double total;
-
-  /// Number of expenses included in [total].
   final int count;
 
-  /// Number of expenses before filtering; shown as "3 of 10" when different.
+  /// Unfiltered count; shows "3 of 10" when different.
   final int? totalCount;
   final bool isLoading;
 

@@ -14,7 +14,7 @@ class MonthSelector extends StatelessWidget {
   final DateTime month;
   final VoidCallback onPrevious;
 
-  /// Null disables the button (e.g. on the current month).
+  /// Null disables the button.
   final VoidCallback? onNext;
 
   @override

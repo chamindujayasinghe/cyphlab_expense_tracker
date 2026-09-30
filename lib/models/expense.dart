@@ -15,7 +15,7 @@ class Expense {
     this.updatedAt,
   });
 
-  /// Firestore document id. Empty for an expense that hasn't been saved yet.
+  /// Firestore document id; empty until saved.
   final String id;
   final String title;
   final double amount;
@@ -23,7 +23,7 @@ class Expense {
   final DateTime date;
   final String? note;
 
-  /// Set by the server; null until the document has been written.
+  /// Server timestamps; null until written.
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -45,8 +45,7 @@ class Expense {
     );
   }
 
-  /// Fields written to Firestore. Timestamps (`createdAt`, `updatedAt`) are
-  /// added by the repository using server time, so they are not included here.
+  /// Fields saved to Firestore; timestamps are added by the repository.
   Map<String, dynamic> toMap() {
     return {
       'title': title,

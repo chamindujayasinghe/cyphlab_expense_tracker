@@ -21,8 +21,7 @@ void main() {
     WidgetTester tester, {
     DateTime Function()? clock,
   }) async {
-    // Phone-like portrait screen so the list isn't pushed off-screen by the
-    // header, total card and filter bar.
+    // Phone-sized screen so the list stays visible.
     tester.view.physicalSize = const Size(420, 1000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -162,7 +161,6 @@ void main() {
     await tester.tap(find.text('Add expense'));
     await tester.pumpAndSettle();
 
-    // Submit empty form.
     await tester.tap(find.widgetWithText(FilledButton, 'Add expense'));
     await tester.pump();
     expect(find.text('Please enter a title'), findsOneWidget);

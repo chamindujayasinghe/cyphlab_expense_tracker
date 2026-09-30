@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/expense.dart';
 
-/// Thrown by [ExpenseRepository] with a message that is safe to show.
+/// Storage error with a user-friendly message.
 class ExpenseRepositoryException implements Exception {
   const ExpenseRepositoryException(this.message);
 
@@ -14,8 +14,7 @@ class ExpenseRepositoryException implements Exception {
   String toString() => 'ExpenseRepositoryException: $message';
 }
 
-/// Storage for a user's expenses. Abstract so providers can be tested with
-/// an in-memory fake.
+/// Expense storage interface (abstract so tests can use a fake).
 abstract class ExpenseRepository {
   /// Live list of expenses with `start <= date < end`, newest first.
   Stream<List<Expense>> watchExpenses({
@@ -24,8 +23,7 @@ abstract class ExpenseRepository {
     required DateTime end,
   });
 
-  /// Saves a new expense and returns its id. If [Expense.id] is set it is
-  /// reused, which lets a deleted expense be restored (undo).
+  /// Saves an expense and returns its id; reuses [Expense.id] if set (undo).
   Future<String> addExpense(String uid, Expense expense);
 
   Future<void> updateExpense(String uid, Expense expense);
@@ -96,9 +94,8 @@ class FirestoreExpenseRepository implements ExpenseRepository {
     return _guard(() => _expenses(uid).doc(expenseId).delete());
   }
 
-  /// Writes resolve only once the server confirms them. Firestore applies them
-  /// locally at once and queues them while offline, so after [_writeTimeout]
-  /// the write is treated as queued rather than leaving the UI waiting.
+  /// Writes resolve only when the server confirms them. After the timeout
+  /// they're treated as queued (Firestore syncs them later).
   static const _writeTimeout = Duration(seconds: 10);
 
   Future<void> _guard(Future<void> Function() action) async {

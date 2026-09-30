@@ -4,7 +4,7 @@ class AppConstants {
 
   static const String appName = 'Expense Tracker';
 
-  /// Currency shown next to every amount. Change here to switch currency.
+  /// Currency label shown with every amount.
   static const String currencySymbol = 'LKR';
 
   static const int titleMaxLength = 50;

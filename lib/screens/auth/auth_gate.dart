@@ -5,8 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../main_shell.dart';
 import 'login_screen.dart';
 
-/// Shows a splash while the persisted auth state loads, then the main tabs
-/// for signed-in users or the login screen otherwise.
+/// Entry screen: splash, then login or the main tabs based on auth state.
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 

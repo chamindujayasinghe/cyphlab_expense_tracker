@@ -7,7 +7,6 @@ import 'package:cyphlab_expense_tracker/services/expense_repository.dart';
 class FakeExpenseRepository implements ExpenseRepository {
   StreamController<List<Expense>>? _controller;
 
-  /// Arguments of the most recent [watchExpenses] call.
   ({String uid, DateTime start, DateTime end})? lastWatch;
   int watchCount = 0;
 

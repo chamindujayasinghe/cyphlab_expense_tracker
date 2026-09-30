@@ -5,10 +5,8 @@ import 'package:flutter/foundation.dart';
 
 import '../services/auth_service.dart';
 
-/// Exposes the signed-in user and auth actions to the UI.
-///
-/// Actions return an error message on failure, or null on success, so screens
-/// can show feedback without handling exceptions themselves.
+/// Auth state and actions for the UI. Actions return an error message,
+/// or null on success.
 class AuthProvider extends ChangeNotifier {
   AuthProvider(this._service) {
     _subscription = _service.authStateChanges().listen((user) {
@@ -29,10 +27,9 @@ class AuthProvider extends ChangeNotifier {
   User? get user => _user;
   bool get isSignedIn => _user != null;
 
-  /// True until Firebase reports the persisted auth state on startup.
+  /// True until Firebase restores the saved login.
   bool get isInitializing => _isInitializing;
 
-  /// True while a sign-in, register, reset or sign-out request is running.
   bool get isSubmitting => _isSubmitting;
 
   Future<String?> signIn({required String email, required String password}) {

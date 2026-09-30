@@ -1,9 +1,6 @@
-// Renders the app's launcher icon to PNG files in assets/icon/.
-//
-// Run with:  flutter test tool/generate_icon_test.dart
-// then:      dart run flutter_launcher_icons
-//
-// Kept outside test/ so it doesn't run with the normal test suite.
+// Draws the launcher icon PNGs into assets/icon/ (kept out of test/).
+// Run: flutter test tool/generate_icon_test.dart
+// Then: dart run flutter_launcher_icons
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -21,8 +18,7 @@ void main() {
     await tester.runAsync(() async {
       Directory('assets/icon').createSync(recursive: true);
 
-      // Full icon: teal background with the glyph (legacy Android, web,
-      // Windows).
+      // Full icon (legacy Android, web, Windows).
       await _writePng('assets/icon/icon.png', (canvas) {
         canvas.drawRect(
           const Rect.fromLTWH(0, 0, _size, _size),
@@ -31,8 +27,7 @@ void main() {
         _drawGlyph(canvas, scale: _size * 0.78);
       });
 
-      // Adaptive icon foreground: transparent, glyph kept inside the central
-      // safe zone because launchers crop adaptive icons to various shapes.
+      // Adaptive icon foreground, kept inside the launcher safe zone.
       await _writePng('assets/icon/icon_foreground.png', (canvas) {
         _drawGlyph(canvas, scale: _size * 0.5);
       });
@@ -40,8 +35,7 @@ void main() {
   });
 }
 
-/// A wallet with a card tucked behind it, centered on the canvas.
-/// Coordinates are fractions of [scale].
+/// Wallet glyph; coordinates are fractions of [scale].
 void _drawGlyph(Canvas canvas, {required double scale}) {
   const center = Offset(_size / 2, _size / 2);
   Offset at(double x, double y) => center + Offset(x * scale, y * scale);
@@ -52,7 +46,11 @@ void _drawGlyph(Canvas canvas, {required double scale}) {
   canvas.rotate(-8 * math.pi / 180);
   canvas.drawRRect(
     RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset.zero, width: 0.46 * scale, height: 0.24 * scale),
+      Rect.fromCenter(
+        center: Offset.zero,
+        width: 0.46 * scale,
+        height: 0.24 * scale,
+      ),
       Radius.circular(0.04 * scale),
     ),
     Paint()..color = _mint,

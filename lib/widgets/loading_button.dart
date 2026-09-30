@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Full-width filled button that shows a spinner and ignores taps while
-/// [isLoading] is true.
+/// Filled button that shows a spinner while [isLoading].
 class LoadingButton extends StatelessWidget {
   const LoadingButton({
     super.key,

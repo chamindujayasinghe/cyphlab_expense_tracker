@@ -1,7 +1,6 @@
 import 'constants.dart';
 
-/// Form field validators. Each returns an error message, or null when valid,
-/// so they plug straight into `TextFormField.validator`.
+/// Form validators: return an error message, or null when valid.
 class Validators {
   Validators._();
 
@@ -29,8 +28,7 @@ class Validators {
     return null;
   }
 
-  /// Parses a value that has already passed [amount]. Accepts thousands
-  /// separators, e.g. `1,250.50`.
+  /// Parses a validated amount, allowing commas (e.g. `1,250.50`).
   static double parseAmount(String value) =>
       double.parse(value.trim().replaceAll(',', ''));
 

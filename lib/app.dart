@@ -6,8 +6,7 @@ import 'screens/auth/auth_gate.dart';
 import 'theme/app_theme.dart';
 import 'utils/constants.dart';
 
-/// Root widget. Kept separate from `main.dart` so it can be pumped in widget
-/// tests without initializing Firebase; tests supply fake providers above it.
+/// Root widget: MaterialApp with the themes and the auth gate.
 class ExpenseTrackerApp extends StatelessWidget {
   const ExpenseTrackerApp({super.key});
 

@@ -15,8 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Loaded up front so the saved theme applies from the first frame. If local
-  // storage is unavailable the app still starts, using the system theme.
+  // Load the saved theme before the first frame (falls back to system).
   SharedPreferences? prefs;
   try {
     prefs = await SharedPreferences.getInstance();
@@ -29,8 +28,7 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (_) => AuthProvider(FirebaseAuthService()),
         ),
-        // Follows the signed-in user: subscribes to their expenses on sign-in
-        // and clears them on sign-out.
+        // Expenses follow the signed-in user.
         ChangeNotifierProxyProvider<AuthProvider, ExpenseProvider>(
           create: (_) => ExpenseProvider(FirestoreExpenseRepository()),
           update: (_, auth, expenses) => expenses!..updateUser(auth.user?.uid),

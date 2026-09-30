@@ -10,8 +10,7 @@ import 'package:cyphlab_expense_tracker/theme/app_theme.dart';
 
 import '../fakes/fake_expense_repository.dart';
 
-/// End-to-end UI flows on the Expenses screen: edit, delete with undo,
-/// swipe to delete, and the unsaved-changes guard.
+/// Edit, delete/undo, swipe-to-delete and unsaved-changes flows.
 void main() {
   late FakeExpenseRepository repository;
 
@@ -135,8 +134,7 @@ void main() {
     await tester.tap(find.text('Add expense'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).first, 'Coffee');
-    // Let the form rebuild and register the unsaved change, as it would
-    // between a real keystroke and tap.
+    // Let the form rebuild before tapping, as between real keystrokes.
     await tester.pump();
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();

@@ -3,15 +3,13 @@ import 'dart:async';
 import 'package:cyphlab_expense_tracker/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// In-memory [AuthService] for tests. Starts signed out; set [errorMessage]
-/// to make the next actions fail with an [AuthException].
+/// In-memory AuthService for tests; set [errorMessage] to force failures.
 class FakeAuthService implements AuthService {
   final _controller = StreamController<User?>.broadcast();
 
   String? errorMessage;
   final List<String> calls = [];
 
-  /// Emits a signed-out state to listeners, as Firebase does on startup.
   void emitSignedOut() => _controller.add(null);
 
   @override

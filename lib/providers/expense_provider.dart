@@ -7,17 +7,9 @@ import '../models/expense_category.dart';
 import '../services/expense_repository.dart';
 import '../utils/expense_stats.dart';
 
-/// Holds the signed-in user's expenses for the selected period, plus the
-/// category and search filters applied to them.
-///
-/// The period is either a calendar month (default) or a custom date range;
-/// it decides what is fetched from Firestore. Category and search filters are
-/// applied client-side to the fetched list, so they need no extra queries or
-/// indexes.
-///
-/// Wired to [AuthProvider] through a proxy provider: [updateUser] starts or
-/// stops the Firestore subscription as the user signs in or out. Actions
-/// return an error message on failure, or null on success.
+/// Expenses for the selected month or date range, plus category/search
+/// filters. Only the period is queried from Firestore; filters run
+/// client-side, so no composite indexes are needed.
 class ExpenseProvider extends ChangeNotifier {
   ExpenseProvider(this._repository, {DateTime Function()? clock})
     : _clock = clock ?? DateTime.now {
@@ -40,17 +32,15 @@ class ExpenseProvider extends ChangeNotifier {
   String? _errorMessage;
   bool _disposed = false;
 
-  /// First day of the month being shown (when no date range is set).
   DateTime get selectedMonth => _selectedMonth;
 
-  /// All expenses fetched for the period, newest first, before filtering.
+  /// All fetched expenses, before filtering.
   List<Expense> get expenses => _expenses;
 
-  /// [expenses] after the category and search filters, newest first.
+  /// Expenses after the category and search filters.
   List<Expense> get visibleExpenses =>
       _visibleCache ??= List.unmodifiable(_expenses.where(_matchesFilters));
 
-  /// Sum of [visibleExpenses].
   double get total =>
       visibleExpenses.fold(0, (sum, expense) => sum + expense.amount);
 
@@ -58,7 +48,6 @@ class ExpenseProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasError => _errorMessage != null;
 
-  /// Months after the current one can't have expenses worth browsing.
   bool get canGoToNextMonth => _selectedMonth.isBefore(_monthStart(_clock()));
 
   bool get isCurrentMonth => !hasDateRange && !canGoToNextMonth;
@@ -67,20 +56,19 @@ class ExpenseProvider extends ChangeNotifier {
 
   bool get hasDateRange => _rangeStart != null;
 
-  /// Inclusive first and last day of the custom range, when set.
+  /// Custom range days (inclusive), when set.
   DateTime? get rangeStart => _rangeStart;
   DateTime? get rangeEnd => _rangeEnd;
 
   Set<ExpenseCategory> get selectedCategories => _categories;
   String get searchQuery => _searchQuery;
 
-  /// True when category or search filters hide part of the fetched list.
   bool get hasListFilters => _categories.isNotEmpty || _searchQuery.isNotEmpty;
 
   bool get hasAnyFilter => hasListFilters || hasDateRange;
 
-  /// Called by the proxy provider whenever auth state changes. Must not call
-  /// [notifyListeners] synchronously because it runs during a build.
+  /// Called by the proxy provider during build, so it must not notify
+  /// listeners synchronously.
   void updateUser(String? uid) {
     if (uid == _uid) return;
     _uid = uid;
@@ -112,8 +100,7 @@ class ExpenseProvider extends ChangeNotifier {
     selectMonth(DateTime(_selectedMonth.year, _selectedMonth.month + 1));
   }
 
-  /// Shows expenses from [start] to [end] (both days inclusive) instead of a
-  /// calendar month.
+  /// Shows a custom date range (both days inclusive) instead of a month.
   void setDateRange(DateTime start, DateTime end) {
     final first = _dayStart(start);
     final last = _dayStart(end);
@@ -124,7 +111,6 @@ class ExpenseProvider extends ChangeNotifier {
     _subscribe();
   }
 
-  /// Returns to the month view.
   void clearDateRange() {
     if (!hasDateRange) return;
     _rangeStart = null;
@@ -147,7 +133,6 @@ class ExpenseProvider extends ChangeNotifier {
     _filtersChanged();
   }
 
-  /// Clears category, search and date-range filters.
   void clearFilters() {
     final hadRange = hasDateRange;
     _categories = const {};
@@ -162,12 +147,9 @@ class ExpenseProvider extends ChangeNotifier {
     }
   }
 
-  /// Re-subscribes after an error.
   void retry() => _subscribe();
 
-  /// Live monthly totals for the [months] months ending with the selected
-  /// month (oldest first). A separate query from the main list, used by the
-  /// summary screen's trend chart.
+  /// Monthly totals for the summary trend chart (a separate query).
   Stream<List<MonthTotal>> watchMonthlyTotals({int months = 6}) {
     final uid = _uid;
     if (uid == null) return const Stream.empty();
@@ -190,7 +172,9 @@ class ExpenseProvider extends ChangeNotifier {
         );
   }
 
-  /// Adds [expense] if it has no id yet, otherwise updates it.
+  // Actions.
+
+  /// Adds a new expense or updates an existing one.
   Future<String?> saveExpense(Expense expense) {
     return _run((uid) async {
       if (expense.id.isEmpty) {
@@ -201,8 +185,7 @@ class ExpenseProvider extends ChangeNotifier {
     });
   }
 
-  /// Removes the expense from the list immediately (so a swiped-away tile
-  /// disappears at once), then deletes it; puts it back if that fails.
+  /// Optimistic delete (required by Dismissible); restored if it fails.
   Future<String?> deleteExpense(Expense expense) async {
     final previous = _expenses;
     _setExpenses(_expenses.where((e) => e.id != expense.id).toList());
@@ -218,19 +201,17 @@ class ExpenseProvider extends ChangeNotifier {
     return error;
   }
 
-  /// Re-creates a just-deleted expense with its original id (undo).
+  /// Undo: re-adds the expense with its original id.
   Future<String?> restoreExpense(Expense expense) {
     return _run((uid) => _repository.addExpense(uid, expense));
   }
 
-  /// Whether [date] falls in the month or date range being shown.
   bool isInPeriod(DateTime date) {
     final (start, end) = _period;
     return !date.isBefore(start) && date.isBefore(end);
   }
 
-  /// Start (inclusive) and end (exclusive) of the period fetched from
-  /// Firestore.
+  /// Query range: start inclusive, end exclusive.
   (DateTime, DateTime) get _period {
     final rangeStart = _rangeStart;
     final rangeEnd = _rangeEnd;

@@ -14,8 +14,7 @@ import '../../widgets/loading_button.dart';
 
 enum ExpenseFormAction { added, updated, deleted }
 
-/// Returned when the form closes after a change, so the home screen can show
-/// feedback (and offer undo for deletes).
+/// Result sent back to the home screen for feedback and undo.
 class ExpenseFormResult {
   const ExpenseFormResult(this.action, this.expense);
 
@@ -23,7 +22,7 @@ class ExpenseFormResult {
   final Expense expense;
 }
 
-/// Adds a new expense, or edits [expense] when given.
+/// Add/edit expense form; edits [expense] when given.
 class ExpenseFormScreen extends StatefulWidget {
   const ExpenseFormScreen({super.key, this.expense});
 
@@ -228,8 +227,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                     const SizedBox(height: 16),
                     DropdownButtonFormField<ExpenseCategory>(
                       initialValue: _category,
-                      // Fill the field width so long labels ellipsize instead
-                      // of overflowing on narrow screens.
+                      // Expanded so long labels ellipsize on narrow screens.
                       isExpanded: true,
                       validator: (value) =>
                           value == null ? 'Please choose a category' : null,
