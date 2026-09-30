@@ -44,7 +44,7 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 - [x] Monthly / category-wise summary
 - [x] Search
 - [x] Firebase Authentication
-- [ ] Any other useful improvement
+- [x] Any other useful improvement
 
 ## Evaluation Criteria
 
@@ -59,14 +59,14 @@ Focus is on implementation quality, not feature count — don't overcomplicate.
 
 ## Deliverables
 
-- [ ] Complete project in a **public** GitHub repository
-- [ ] README containing:
-  - [ ] Project setup instructions
-  - [ ] Features implemented
-  - [ ] Technologies / packages used
-  - [ ] AI tools used and how they helped
-- [ ] Short screen recording of the finished app (Google Drive public link or unlisted YouTube)
-- [ ] APK / release build link (if possible)
+- [x] Complete project in a **public** GitHub repository
+- [x] README containing:
+  - [x] Project setup instructions
+  - [x] Features implemented
+  - [x] Technologies / packages used
+  - [x] AI tools used and how they helped
+- [x] Short screen recording of the finished app (Google Drive public link or unlisted YouTube)
+- [x] APK / release build link (if possible)
 - [ ] Send both the GitHub link and the recording link
 
 ## Notes

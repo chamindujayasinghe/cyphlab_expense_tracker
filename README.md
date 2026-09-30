@@ -3,7 +3,7 @@
 A clean, simple expense tracker built with **Flutter** and **Firebase**. Sign in, record your spending, and see where your money goes with monthly totals, filters and charts.
 
 - **Download APK:** [Latest release](https://github.com/chamindujayasinghe/cyphlab_expense_tracker/releases/latest)
-- **Demo video:** _link to be added_
+- **Demo video:** [Watch on Google Drive](https://drive.google.com/file/d/1ffamNKOUI9cJAwVjLaMejRYJWlXhH6n6/view?usp=sharing)
 
 ## Features
 
