@@ -24,7 +24,7 @@ Firestore: `users/{uid}/expenses/{id}` holds `title, amount, category (enum name
 
 Theme: `ThemeProvider` persists the light/dark/system choice with `shared_preferences`. `main()` loads the prefs before `runApp` so the first frame uses the right theme.
 
-Tests use fakes in `test/fakes/` (`FakeAuthService`, `FakeExpenseRepository`), and never touch Firebase. `test/screens/small_screen_test.dart` renders every screen at 320×568 with 1.3× text in both themes, so new layouts must not overflow there.
+Tests use fakes in `test/fakes/` (`FakeAuthService`, `FakeExpenseRepository`) and never touch real Firebase. `FirestoreExpenseRepository` itself is tested against `fake_cloud_firestore` in `test/services/`. `test/screens/small_screen_test.dart` renders every screen at 320×568 with 1.3× text in both themes, so new layouts must not overflow there.
 
 Launcher icons: `tool/generate_icon_test.dart` draws the source PNGs into `assets/icon/` (run it with `flutter test tool/generate_icon_test.dart`), then `dart run flutter_launcher_icons` generates the platform icons from the config in `pubspec.yaml`.
 
